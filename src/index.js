@@ -15,6 +15,7 @@ const setFocusOnNavBar = (nb) => {
 };
 
 const renderHome = () => {
+    setFocusOnNavBar(NavBar["Home"]);
     app.innerHTML = `<div class="time-box">
             <div id="time"></div>
             <div id="date"></div>
@@ -35,20 +36,56 @@ const renderHome = () => {
         const minutes = new Date().getMinutes() < 10 ? `0${new Date().getMinutes()}` : new Date().getMinutes();
         time.innerText = `${hours}:${minutes}`;
     }, 1000);
-    setFocusOnNavBar(NavBar["Home"]);
 };
 
 const renderNote = () => {
+    setFocusOnNavBar(NavBar["Note"]);
     app.innerHTML = `<div class="note" contenteditable="true">${localStorage.getItem("note") ? localStorage.getItem("note") : ""}</div>`;
 
     const note = document.getElementsByClassName("note")[0];
     note.focus();
     note.addEventListener("input", ev => {
-        console.log(note.innerText);
         localStorage.setItem("note", note.innerHTML);
     });
-    setFocusOnNavBar(NavBar["Note"]);
 };
+
+const renderRss = () => {
+    setFocusOnNavBar(NavBar["Rss"]);
+    app.innerHTML = `<div class="rss"><div><input id="input-url" type="text" placeholder="Enter rss url..." /><button id="btn-rss">Click to add</button></div><div id="list-rss"></div></div>`;
+    const saveRss = localStorage.getItem("rss");
+    let listUrl = saveRss ? JSON.parse(saveRss) : [];
+
+    listUrl.forEach(async url => {
+        const res = await fetch(url);
+        console.log(res);
+    })
+
+    document.getElementById("btn-rss").addEventListener("click", async () => {
+        const inputUrl = document.getElementById("input-url");
+        const url = inputUrl.value;
+
+        if (url === "") {
+            return;
+        }
+        const regex = new RegExp(/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi);
+        if (!url.match(regex)) {
+            alert("URL not valid");
+            return;
+        }
+        for (const oldUrl of listUrl) {
+            if (oldUrl === url) {
+                alert("You can't add tow time the same url");
+                return;
+            }
+        }
+        listUrl.push(url);
+        localStorage.setItem("rss", JSON.stringify(listUrl));
+        inputUrl.value = "";
+        renderRss();
+    });
+};
+
+// https://lobste.rs/t/programming.rss
 
 root.childNodes[1].addEventListener("click", (ev) => {
     if (ev.target.innerText === "Home") {
@@ -57,6 +94,10 @@ root.childNodes[1].addEventListener("click", (ev) => {
     }
     if (ev.target.innerText === "Note") {
         renderNote();
+        return;
+    }
+    if (ev.target.innerText === "Rss") {
+        renderRss();
         return;
     }
 });

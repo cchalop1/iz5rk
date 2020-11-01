@@ -1,15 +1,16 @@
 {
-    "name": "vanilla-typescript",
+    "name": "",
     "version": "1.0.0",
-    "description": "JavaScript and TypeScript example starter project",
+    "description": "",
     "main": "index.html",
     "scripts": {
-        "start": "parcel index.html --port 8080",
+        "dev": "parcel index.html -p 8080",
         "build": "parcel build index.html"
     },
-    "dependencies": {},
+    "dependencies": {
+        "parcel-bundler": "^1.12.4"
+    },
     "devDependencies": {
-        "parcel-bundler": "^1.6.1",
         "sass": "^1.27.1"
     },
     "keywords": [
